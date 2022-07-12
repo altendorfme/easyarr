@@ -15,8 +15,6 @@ qBittorrent has the largest number of options with no need for addons, its confi
 
 All application traffic will go through Wireguard and to access the application's WebUIs, you must also be connected to the VPN. [Clients](https://www.wireguard.com/install/) for Wireguard are available for all platforms.
 
-# First Steps
-
 ## Security
 
 Create the new public and private keys, then rename and copy and delete the public key:
@@ -163,7 +161,7 @@ When connecting to VPN, all applications will be accessed on IP `10.13.13.1`, yo
 - Bazarr: **6767**
 - Jackett: **9117**
 
-## References
+# References and credits
 
 - https://plex.tv
 - https://github.com/Sonarr/Sonarr
