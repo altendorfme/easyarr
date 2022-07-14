@@ -6,6 +6,7 @@ services:
     image: containrrr/watchtower:latest
     restart: unless-stopped
     volumes: 
+      - /etc/localtime:/etc/localtime:ro
       - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       - WATCHTOWER_CLEANUP=true
@@ -34,6 +35,7 @@ services:
     network_mode: bridge
     restart: unless-stopped
     volumes: 
+      - /etc/localtime:/etc/localtime:ro
       - "${DOCKER}/wireguard:/config"
       - "/lib/modules:/lib/modules"
     ports:
@@ -54,6 +56,7 @@ services:
     network_mode: service:wireguard
     restart: unless-stopped
     volumes: 
+      - /etc/localtime:/etc/localtime:ro
       - "${DOCKER}/heimdall:/config"
     depends_on:
       - wireguard
@@ -73,8 +76,9 @@ services:
     network_mode: service:wireguard
     restart: unless-stopped
     volumes: 
+      - /etc/localtime:/etc/localtime:ro
       - "${DOCKER}/qbittorrent:/config"
-      - "${STORAGE}/downloads:/downloads"
+      - "${STORAGE}:/storage"
     depends_on:
       - wireguard
     labels:
@@ -95,9 +99,9 @@ services:
     network_mode: service:wireguard
     restart: unless-stopped
     volumes: 
+      - /etc/localtime:/etc/localtime:ro
       - "${DOCKER}/plex:/config"
-      - "${STORAGE}/tv-shows:/tv-shows"
-      - "${STORAGE}/movies:/movies"
+      - "${STORAGE}:/storage"
     depends_on:
       - wireguard
     labels:
@@ -116,6 +120,7 @@ services:
     network_mode: service:wireguard
     restart: unless-stopped
     volumes: 
+      - /etc/localtime:/etc/localtime:ro
       - "${DOCKER}/jackett:/config"
     depends_on:
       - wireguard
@@ -135,9 +140,9 @@ services:
     network_mode: service:wireguard
     restart: unless-stopped
     volumes: 
+      - /etc/localtime:/etc/localtime:ro
       - "${DOCKER}/radarr:/config"
-      - "${STORAGE}/movies:/movies"
-      - "${STORAGE}/downloads:/downloads"
+      - "${STORAGE}:/storage"
     depends_on:
       - jackett
       - qbittorrent
@@ -158,9 +163,9 @@ services:
     network_mode: service:wireguard
     restart: unless-stopped
     volumes: 
+      - /etc/localtime:/etc/localtime:ro
       - "${DOCKER}/sonarr:/config"
-      - "${STORAGE}/tv-shows:/tv-shows"
-      - "${STORAGE}/downloads:/downloads"
+      - "${STORAGE}:/storage"
     depends_on:
       - jackett
       - qbittorrent
@@ -181,9 +186,9 @@ services:
     network_mode: service:wireguard
     restart: unless-stopped
     volumes: 
+      - /etc/localtime:/etc/localtime:ro
       - "${DOCKER}/bazarr:/config"
-      - "${STORAGE}/tv-shows:/tv-shows"
-      - "${STORAGE}/movies:/movies"
+      - "${STORAGE}:/storage"
     depends_on:
       - sonarr
       - radarr

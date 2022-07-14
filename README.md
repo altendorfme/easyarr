@@ -161,6 +161,39 @@ When connecting to VPN, all applications will be accessed on IP `10.13.13.1`, yo
 - Bazarr: **6767**
 - Jackett: **9117**
 
+## Path configuration
+
+### Sonarr
+
+<pre>
+Settings > Media Management > Importing
+- Check <b>Use Hardlinks when trying to copy files from torrents that are still being seeded</b>
+</pre>
+
+<pre>
+Settings > Media Management > Root Folders
+- <b>/storage/tv-shows/</b>
+</pre>
+
+### Radarr
+
+<pre>
+Settings > Media Management > Importing
+- Check <b>Use Hardlinks when trying to copy files from torrents that are still being seeded</b>
+</pre>
+
+<pre>
+Settings > Media Management > Root Folders
+- <b>/storage/tv-shows/</b>
+</pre>
+
+### qBittorrent
+
+<pre>
+Options > Downloads
+- Default Save Path: <b>/storage/downloads</b>
+</pre>
+
 # References and credits
 
 - https://plex.tv
@@ -173,3 +206,4 @@ When connecting to VPN, all applications will be accessed on IP `10.13.13.1`, yo
 - https://github.com/WireGuard
 - https://www.qbittorrent.org
 - https://www.linuxserver.io
+- https://trash-guides.info/
