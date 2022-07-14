@@ -184,7 +184,7 @@ Settings > Media Management > Importing
 
 <pre>
 Settings > Media Management > Root Folders
-- <b>/storage/tv-shows/</b>
+- <b>/storage/movies/</b>
 </pre>
 
 ### qBittorrent
