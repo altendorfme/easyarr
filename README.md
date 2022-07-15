@@ -194,6 +194,12 @@ Options > Downloads
 - Default Save Path: <b>/storage/downloads</b>
 </pre>
 
+### Jackett
+
+<pre>
+FileSolverr API URL: <b>http://10.13.13.1:8191</b>
+</pre>
+
 # References and credits
 
 - https://plex.tv
