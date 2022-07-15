@@ -160,7 +160,6 @@ When connecting to VPN, all applications will be accessed on IP `10.13.13.1`, yo
 - Radarr: **7878**
 - Bazarr: **6767**
 - Jackett: **9117**
-- FlareSolverr: **8191**
 
 ## Path configuration
 
@@ -193,12 +192,6 @@ Settings > Media Management > Root Folders
 <pre>
 Options > Downloads
 - Default Save Path: <b>/storage/downloads</b>
-</pre>
-
-### Jackett
-
-<pre>
-FileSolverr API URL: <b>http://10.13.13.1:8191</b>
 </pre>
 
 # References and credits
