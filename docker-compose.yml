@@ -123,7 +123,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${DOCKER:-/opt}/jackett:/config
     depends_on:
-      - flaresolverr
       - wireguard
     labels:
       - com.centurylinklabs.watchtower.enable=true
