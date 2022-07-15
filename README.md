@@ -160,6 +160,7 @@ When connecting to VPN, all applications will be accessed on IP `10.13.13.1`, yo
 - Radarr: **7878**
 - Bazarr: **6767**
 - Jackett: **9117**
+- FlareSolverr: **8191**
 
 ## Path configuration
 
