@@ -1,13 +1,11 @@
 # EasyArr: HTPC with Docker
 
-> Plex Media Server, Sonarr, Radarr, Bazarr, Jackett, qBittorrent, Wireguard, WatchTower
+> Plex Media Server, Sonarr, Radarr, Bazarr, Prowlarr, qBittorrent, Wireguard, WatchTower
 
 Alternatives
 
 - Plex Media Server: Jellyfin
 I have a lifetime license for Plex, and I still think it's the best and most complete solution, if you want to install both it won't be difficult to adjust it in Docker.
-- Jackett: Prowlarr
-Prowlarr is still under development and I had some sync problems, my recommendation is to stick with the simple and stable Jackett.
 - qBittorrent: Deluge, Transmission, rTorrent
 qBittorrent has the largest number of options with no need for addons, its configuration is fast and has a good performance.
 
@@ -116,7 +114,7 @@ mkdir -p /storage/{tv-shows,movies,downloads}
 </pre>
 
 ## Install containers
-> Plex, Radarr, Sonarr, Bazarr, Jackett, qBittorrent, Wireguard, Watchtower
+> Plex, Radarr, Sonarr, Bazarr, Prowlarr, qBittorrent, Wireguard, Watchtower
 
 <pre>id</pre>
 Get response and change PUID and PGID in *.env*
@@ -159,7 +157,7 @@ When connecting to VPN, all applications will be accessed on IP `10.13.13.1`, yo
 - Sonarr: **8989**
 - Radarr: **7878**
 - Bazarr: **6767**
-- Jackett: **9117**
+- Prowlarr: **9696**
 
 ## Path configuration
 
@@ -200,7 +198,7 @@ Options > Downloads
 - https://github.com/Sonarr/Sonarr
 - https://github.com/Radarr/Radarr
 - https://github.com/morpheus65535/bazarr
-- https://github.com/Jackett/Jackett
+- https://github.com/Prowlarr/Prowlarr
 - https://github.com/containrrr/watchtower
 - https://github.com/ngosang/trackerslist
 - https://github.com/WireGuard

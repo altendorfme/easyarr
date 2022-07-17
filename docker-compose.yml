@@ -107,21 +107,21 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
-  # Jackett
-  jackett: 
-    container_name: jackett
+  # Prowlarr
+  prowlarr: 
+    container_name: prowlarr
     environment: 
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-Etc/GMT}
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-    image: lscr.io/linuxserver/jackett:latest
+    image: lscr.io/linuxserver/prowlarr:develop
     network_mode: service:wireguard
     restart: unless-stopped
     volumes: 
       - /etc/localtime:/etc/localtime:ro
-      - ${DOCKER:-/opt}/jackett:/config
+      - ${DOCKER:-/opt}/prowlarr:/config
     depends_on:
       - wireguard
     labels:
@@ -144,7 +144,7 @@ services:
       - ${DOCKER:-/opt}/radarr:/config
       - ${STORAGE:-/storage}:/storage
     depends_on:
-      - jackett
+      - prowlarr
       - qbittorrent
       - wireguard
     labels:
@@ -167,7 +167,7 @@ services:
       - ${DOCKER:-/opt}/sonarr:/config
       - ${STORAGE:-/storage}:/storage
     depends_on:
-      - jackett
+      - prowlarr
       - qbittorrent
       - wireguard
     labels:
