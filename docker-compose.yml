@@ -62,6 +62,7 @@ services:
       - wireguard
     labels:
       - com.centurylinklabs.watchtower.enable=true
+      - com.centurylinklabs.watchtower.depends-on=wireguard
 
   # qBittorrent
   qbittorrent: 
@@ -83,6 +84,7 @@ services:
       - wireguard
     labels:
       - com.centurylinklabs.watchtower.enable=true
+      - com.centurylinklabs.watchtower.depends-on=wireguard
 
   # Plex
   plex: 
@@ -106,6 +108,7 @@ services:
       - wireguard
     labels:
       - com.centurylinklabs.watchtower.enable=true
+      - com.centurylinklabs.watchtower.depends-on=wireguard
 
   # Prowlarr
   prowlarr: 
@@ -126,6 +129,7 @@ services:
       - wireguard
     labels:
       - com.centurylinklabs.watchtower.enable=true
+      - com.centurylinklabs.watchtower.depends-on=wireguard
 
   # Radarr
   radarr: 
@@ -144,11 +148,12 @@ services:
       - ${DOCKER:-/opt}/radarr:/config
       - ${STORAGE:-/storage}:/storage
     depends_on:
+      - wireguard
       - prowlarr
       - qbittorrent
-      - wireguard
     labels:
       - com.centurylinklabs.watchtower.enable=true
+      - com.centurylinklabs.watchtower.depends-on=wireguard,prowlarr,qbittorrent
 
   # Sonarr
   sonarr: 
@@ -167,11 +172,12 @@ services:
       - ${DOCKER:-/opt}/sonarr:/config
       - ${STORAGE:-/storage}:/storage
     depends_on:
+      - wireguard
       - prowlarr
       - qbittorrent
-      - wireguard
     labels:
       - com.centurylinklabs.watchtower.enable=true
+      - com.centurylinklabs.watchtower.depends-on=wireguard,prowlarr,qbittorrent
 
   # Bazarr
   bazarr: 
@@ -190,8 +196,9 @@ services:
       - ${DOCKER:-/opt}/bazarr:/config
       - ${STORAGE:-/storage}:/storage
     depends_on:
+      - wireguard
       - sonarr
       - radarr
-      - wireguard
     labels:
       - com.centurylinklabs.watchtower.enable=true
+      - com.centurylinklabs.watchtower.depends-on=wireguard,sonarr,radarr
