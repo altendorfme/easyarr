@@ -230,6 +230,8 @@ Options > Downloads
 
 <pre>
 Settings > Network > Custom server access URLs: <b>https://plex.domain.xyz</b>
+
+Settings > Remote Access: <b>Disable Remote Access</b>
 </pre>
 
 # References and credits
