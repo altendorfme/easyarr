@@ -1,11 +1,11 @@
 version: "3.3"
-services: 
+services:
   # Watchtower
-  watchtower: 
+  watchtower:
     container_name: watchtower
     image: containrrr/watchtower:latest
     restart: unless-stopped
-    volumes: 
+    volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -15,190 +15,171 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
-  # Wireguard
-  wireguard: 
-    container_name: wireguard
-    environment: 
-      - PUID=${PUID:-1000}
-      - PGID=${PGID:-1000}
-      - TZ=${TZ:-Etc/GMT}
-      - PEERS=2
-      - PEERDNS=auto
-      - INTERNAL_SUBNET=10.13.13.0
-      - ALLOWEDIPS=0.0.0.0/0
+  # SWAG - Secure Web Application Gateway
+  swag:
+    container_name: swag
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-    image: ghcr.io/linuxserver/wireguard:latest
-    network_mode: bridge
-    restart: unless-stopped
-    volumes: 
-      - /etc/localtime:/etc/localtime:ro
-      - ${DOCKER:-/opt}/wireguard:/config
-      - /lib/modules:/lib/modules
-    ports:
-      - 51820:51820/udp
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
-
-  # Heimdall
-  heimdall: 
-    container_name: heimdall
-    environment: 
+    environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-Etc/GMT}
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-    image: lscr.io/linuxserver/heimdall:latest
-    network_mode: service:wireguard
+      - URL=${DOMAIN}
+      - SUBDOMAINS=${SUBDOMAINS:-plex,qbittorrent,radarr,sonarr,bazarr,prowlarr}
+      - ONLY_SUBDOMAINS=true
+      - DNSPLUGIN=${DNSPLUGIN:-cloudflare}
+      - VALIDATION=${VALIDATION:-dns}
+      - PROPAGATION=20
+    image: ghcr.io/linuxserver/swag:latest
+    ports:
+      - 80:80
+      - 443:443
     restart: unless-stopped
-    volumes: 
-      - /etc/localtime:/etc/localtime:ro
-      - ${DOCKER:-/opt}/heimdall:/config
-    depends_on:
-      - wireguard
+    volumes:
+      - ${DOCKER:-/opt}/swag:/config
     labels:
       - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.depends-on=wireguard
 
   # qBittorrent
-  qbittorrent: 
+  qbittorrent:
     container_name: qbittorrent
-    environment: 
+    environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-Etc/GMT}
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
     image: lscr.io/linuxserver/qbittorrent:latest
-    network_mode: service:wireguard
     restart: unless-stopped
-    volumes: 
+    depends_on:
+      - swag
+    volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DOCKER:-/opt}/qbittorrent:/config
       - ${STORAGE:-/storage}:/storage
-    depends_on:
-      - wireguard
+    ports:
+      - 127.0.0.1:8080:8080
+      - 127.0.0.1:6881:6881
+      - 127.0.0.1:6881:6881/udp
     labels:
       - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.depends-on=wireguard
+      - com.centurylinklabs.watchtower.depends-on=swag
 
   # Plex
-  plex: 
+  plex:
     container_name: plex
-    environment: 
+    environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - VERSION=docker
       - TZ=${TZ:-Etc/GMT}
       - PLEX_CLAIM=${PLEX_CLAIM}
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
     image: lscr.io/linuxserver/plex:latest
-    network_mode: service:wireguard
     restart: unless-stopped
-    volumes: 
+    depends_on:
+      - swag
+    volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DOCKER:-/opt}/plex:/config
       - ${STORAGE:-/storage}:/storage
-    depends_on:
-      - wireguard
+    ports:
+      - 127.0.0.1:32400:32400
+      - 127.0.0.1:1900:1900/udp
+      - 127.0.0.1:3005:3005
+      - 127.0.0.1:5353:5353/udp
+      - 127.0.0.1:8324:8324
+      - 127.0.0.1:32410:32410/udp
+      - 127.0.0.1:32412:32412/udp
+      - 127.0.0.1:32413:32413/udp
+      - 127.0.0.1:32414:32414/udp
+      - 127.0.0.1:32469:32469
     labels:
       - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.depends-on=wireguard
+      - com.centurylinklabs.watchtower.depends-on=swag
 
   # Prowlarr
-  prowlarr: 
+  prowlarr:
     container_name: prowlarr
-    environment: 
+    environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-Etc/GMT}
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
     image: lscr.io/linuxserver/prowlarr:develop
-    network_mode: service:wireguard
     restart: unless-stopped
-    volumes: 
+    depends_on:
+      - swag
+    volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DOCKER:-/opt}/prowlarr:/config
-    depends_on:
-      - wireguard
+    ports:
+      - 127.0.0.1:9696:9696
     labels:
       - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.depends-on=wireguard
+      - com.centurylinklabs.watchtower.depends-on=swag
 
   # Radarr
-  radarr: 
+  radarr:
     container_name: radarr
-    environment: 
+    environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-Etc/GMT}
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
     image: lscr.io/linuxserver/radarr:latest
-    network_mode: service:wireguard
     restart: unless-stopped
-    volumes: 
+    volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DOCKER:-/opt}/radarr:/config
       - ${STORAGE:-/storage}:/storage
     depends_on:
-      - wireguard
+      - swag
       - prowlarr
       - qbittorrent
+    ports:
+      - 127.0.0.1:7878:7878
     labels:
       - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.depends-on=wireguard,prowlarr,qbittorrent
+      - com.centurylinklabs.watchtower.depends-on=swag,prowlarr,qbittorrent
 
   # Sonarr
-  sonarr: 
+  sonarr:
     container_name: sonarr
-    environment: 
+    environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-Etc/GMT}
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
     image: lscr.io/linuxserver/sonarr:latest
-    network_mode: service:wireguard
     restart: unless-stopped
-    volumes: 
+    volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DOCKER:-/opt}/sonarr:/config
       - ${STORAGE:-/storage}:/storage
     depends_on:
-      - wireguard
+      - swag
       - prowlarr
       - qbittorrent
+    ports:
+      - 127.0.0.1:8989:8989
     labels:
       - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.depends-on=wireguard,prowlarr,qbittorrent
+      - com.centurylinklabs.watchtower.depends-on=swag,prowlarr,qbittorrent
 
   # Bazarr
-  bazarr: 
+  bazarr:
     container_name: bazarr
-    environment: 
+    environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-Etc/GMT}
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
     image: lscr.io/linuxserver/bazarr:latest
-    network_mode: service:wireguard
     restart: unless-stopped
-    volumes: 
+    volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DOCKER:-/opt}/bazarr:/config
       - ${STORAGE:-/storage}:/storage
     depends_on:
-      - wireguard
+      - swag
       - sonarr
       - radarr
+    ports:
+      - 127.0.0.1:6767:6767
     labels:
       - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.depends-on=wireguard,sonarr,radarr
+      - com.centurylinklabs.watchtower.depends-on=swag,sonarr,radarr

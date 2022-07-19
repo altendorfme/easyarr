@@ -1,17 +1,13 @@
 # EasyArr: HTPC with Docker
 
-> Plex Media Server, Sonarr, Radarr, Bazarr, Prowlarr, qBittorrent, Wireguard, WatchTower
+> Tested on Debian 10+ (Buster)
+
+> Plex Media Server, Sonarr, Radarr, Bazarr, Prowlarr, qBittorrent, SWAG and WatchTower
 
 Alternatives
 
-- Plex Media Server: Jellyfin
-I have a lifetime license for Plex, and I still think it's the best and most complete solution, if you want to install both it won't be difficult to adjust it in Docker.
-- qBittorrent: Deluge, Transmission, rTorrent
-qBittorrent has the largest number of options with no need for addons, its configuration is fast and has a good performance.
-
-> Tested on Debian 10+ (Buster)
-
-All application traffic will go through Wireguard and to access the application's WebUIs, you must also be connected to the VPN. [Clients](https://www.wireguard.com/install/) for Wireguard are available for all platforms.
+- Plex Media Server to Jellyfin: I have a lifetime license for Plex, and I still think it's the best and most complete solution, if you want to install both it won't be difficult to adjust it in Docker.
+- qBittorrent to Deluge, Transmission, rTorrent: qBittorrent has the largest number of options with no need for addons, its configuration is fast and has a good performance.
 
 ## Security
 
@@ -33,7 +29,6 @@ PasswordAuthentication no
 </pre>
 
 **Ready!** Once the server restarts you will only have access with the private key.
-
 
 ## Update, upgrade and basic packages
 
@@ -114,24 +109,36 @@ mkdir -p /storage/{tv-shows,movies,downloads}
 </pre>
 
 ## Install containers
-> Plex, Radarr, Sonarr, Bazarr, Prowlarr, qBittorrent, Wireguard, Watchtower
+> Plex Media Server, Sonarr, Radarr, Bazarr, Prowlarr, qBittorrent, SWAG and WatchTower
 
 <pre>id</pre>
 Get response and change PUID and PGID in *.env*
 
 `nano .env`
+
+Values with # are not required, but are set this way by default.
+
 <pre>
-STORAGE=/storage
-DOCKER=/opt
+#STORAGE=/storage
+#DOCKER=/opt
 
-PUID=<b>ID</b>
-PGID=<b>ID</b>
-TZ=Etc/GMT
+#PUID=<b>ID</b>
+#PGID=<b>ID</b>
+#TZ=<b>Etc/GMT</b>
 
+#DNSPLUGIN=<b>cloudflare</b>
+#VALIDATION=<b>dns</b>
+#SUBDOMAINS=<b>plex,qbittorrent,radarr,sonarr,bazarr,prowlarr</b>
+
+DOMAIN=<b>DOMAIN.XYZ</b>
 PLEX_CLAIM=<b>CLAIM_CODE</b>
 </pre>
 
 > You can obtain a claim token from https://plex.tv/claim and input here. Keep in mind that the claim tokens expire within 4 minutes.
+
+> SWAG allows the configuration of several [DNS platforms](https://docs.linuxserver.io/general/swag#create-container-via-dns-validation-with-a-wildcard-cert), but Cloudflare is one of the most practical and secure solutions.
+
+> If you need a cheap domain, use [Namecheap Beast Mode](https://www.namecheap.com/domains/registration/results/?type=beast&domain=)
 
 <pre>
 rm docker-compose.yml; curl -o docker-compose.yml -L https://raw.githubusercontent.com/altendorfme/easyarr/main/docker-compose.yml
@@ -141,16 +148,34 @@ sudo docker-compose up -d --remove-orphans
 
 Wait for the complete installation of all applications, it may take several minutes.
 
-## Connecting to VPN
+## Configuring SWAG
 
-In */opt/wireguard/peer1* and */opt/wireguard/peer2*, we have two access configurations already created.
-Download the `.conf` and `.png` files, it is enough to make a connection through all Wireguard clients.
+Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) > My Profile > API Tokens
 
-The parameter `PEERS=2` on [docker-compose.yml](https://raw.githubusercontent.com/altendorfme/easyarr/main/docker-compose.yml) defined the creation of only 2 peers, configure as you see fit.
+Click on <b>Create Tokens</b>, use template <b>Edit zone DNS</b>.
 
-When connecting to VPN, all applications will be accessed on IP `10.13.13.1`, you can change this in `INTERNAL_SUBNET` parameter on [docker-compose.yml](https://raw.githubusercontent.com/altendorfme/easyarr/main/docker-compose.yml).
+Add new Permissions with <b>Zone > DNS > Read</b>.
 
-## Web UI ports by applications
+In Zone Resources select <b>Your domain</b>.
+
+Click on <b>Continue the summary</b>, then <b>Create Token</b>
+
+<pre>
+echo "dns_cloudflare_api_token = <b>TOKEN</b>" > /opt/swag/dns-conf/cloudflare.ini
+</pre>
+
+<pre>
+sudo cp /opt/swag/nginx/proxy-confs/plex.subdomain.conf.sample /opt/swag/nginx/proxy-confs/plex.subdomain.conf 
+sudo cp /opt/swag/nginx/proxy-confs/qbittorrent.subdomain.conf.sample /opt/swag/nginx/proxy-confs/qbittorrent.subdomain.conf 
+sudo cp /opt/swag/nginx/proxy-confs/sonarr.subdomain.conf.sample /opt/swag/nginx/proxy-confs/sonarr.subdomain.conf 
+sudo cp /opt/swag/nginx/proxy-confs/radarr.subdomain.conf.sample /opt/swag/nginx/proxy-confs/radarr.subdomain.conf 
+sudo cp /opt/swag/nginx/proxy-confs/bazarr.subdomain.conf.sample /opt/swag/nginx/proxy-confs/bazarr.subdomain.conf 
+sudo cp /opt/swag/nginx/proxy-confs/prowlarr.subdomain.conf.sample /opt/swag/nginx/proxy-confs/prowlarr.subdomain.conf 
+</pre>
+
+`sudo docker restart swag`
+
+## Local web UI ports by applications
 
 - Plex: **32400**
 - qBittorrent: **8080**
@@ -158,6 +183,15 @@ When connecting to VPN, all applications will be accessed on IP `10.13.13.1`, yo
 - Radarr: **7878**
 - Bazarr: **6767**
 - Prowlarr: **9696**
+
+## Public web UI ports by applications
+
+- Plex: plex.**domain.xyz**
+- qBittorrent: qbittorrent.**domain.xyz**
+- Sonarr: sonarr.**domain.xyz**
+- Radarr: radarr.**domain.xyz**
+- Bazarr: bazarr.**domain.xyz**
+- Prowlarr: prowlarr.**domain.xyz**
 
 ## Path configuration
 
@@ -192,6 +226,12 @@ Options > Downloads
 - Default Save Path: <b>/storage/downloads</b>
 </pre>
 
+### Plex
+
+<pre>
+Settings > Network > Custom server access URLs: <b>https://plex.domain.xyz</b>
+</pre>
+
 # References and credits
 
 - https://plex.tv
@@ -201,7 +241,8 @@ Options > Downloads
 - https://github.com/Prowlarr/Prowlarr
 - https://github.com/containrrr/watchtower
 - https://github.com/ngosang/trackerslist
-- https://github.com/WireGuard
+- https://github.com/linuxserver/docker-swag
 - https://www.qbittorrent.org
 - https://www.linuxserver.io
-- https://trash-guides.info/
+- https://trash-guides.info
+- https://github.com/chaifeng/ufw-docker
